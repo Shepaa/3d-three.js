@@ -63,7 +63,7 @@ function explodeShapes() {
           Math.random() - 0.5,
           Math.random() - 0.5,
           Math.random() - 0.5,
-      ).normalize().multiplyScalar(5);
+      ).normalize().multiplyScalar(10);
 
       newPosition.add(randomDirection);
     }
