@@ -18,7 +18,7 @@ body
     outline: none;
 }
 .control-panel {
-    width: 300px;
+    width: 420px;
     height: 130px;
     position: fixed;
     z-index: 1;
@@ -69,7 +69,7 @@ body
 
 .control-panel_buttons {
     display: flex;
-    justify-content: space-between;
+    gap: 20px
 }
 
 .control-panel_button button {

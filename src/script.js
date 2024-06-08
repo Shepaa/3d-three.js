@@ -11,6 +11,32 @@ import gsap from 'gsap';
 const canvas = document.querySelector('canvas.webgl');
 const shapeGeneratorBtn = document.querySelector('#shapeGeneratorBtn');
 const explodeBtn = document.querySelector('#explodeBtn');
+const spinAllBtn = document.querySelector('#spinAllBtn');
+const spinEachBtn = document.querySelector('#spinEachBtn');
+const group = new THREE.Group();
+
+spinEachBtn.addEventListener('click', () => {
+  meshes.forEach(mesh => {
+    gsap.to(mesh.rotation,
+        {duration: 1, y: mesh.rotation.y + Math.PI * 2, ease: 'power2.out'});
+  });
+});
+
+spinAllBtn.addEventListener('click', () => {
+  const randomAxis = new THREE.Vector3(
+      Math.random() - 0.5,
+      Math.random() - 0.5,
+      Math.random() - 0.5
+  ).normalize();
+
+  gsap.to(group.rotation, {
+    duration: 1,
+    x: randomAxis.x * Math.PI * 2,
+    y: randomAxis.y * Math.PI * 2,
+    z: randomAxis.z * Math.PI * 2,
+    ease: 'power2.out'
+  });
+});
 shapeGeneratorBtn.addEventListener('click', generateShape);
 explodeBtn.addEventListener('click', explodeShapes);
 
@@ -19,14 +45,15 @@ const scene = new THREE.Scene();
 const geometry = generateGeometry(geometries);
 const material = new THREE.MeshBasicMaterial({map: generateTexture(textures)});
 const mesh = new THREE.Mesh(geometry, material);
-scene.add(mesh);
+group.add(mesh);
+scene.add(group);
 let meshes = [mesh];
 
 function generateShape() {
   while (scene.children.length > 0) {
     scene.remove(scene.children[0]);
   }
-
+  group.clear();
   const shapeSize = getUserAxisData();
   meshes = [];
 
@@ -40,13 +67,13 @@ function generateShape() {
         mesh.position.set((x - shapeSize.xValue / 2 - 0.5) * 1.2,
             (y - shapeSize.yValue / 2 - 0.5) * 1.2,
             (z - shapeSize.zValue / 2 - 0.5) * 1.2);
-
-        scene.add(mesh);
+        group.add(mesh);
+        scene.add(group);
         meshes.push(mesh);
 
-        camera.position.x = shapeSize.xValue + 2;
-        camera.position.y = shapeSize.yValue + 2;
-        camera.position.z = shapeSize.zValue + 2;
+        camera.position.x = shapeSize.xValue + 1;
+        camera.position.y = shapeSize.yValue + 1;
+        camera.position.z = shapeSize.zValue + 1;
         camera.updateProjectionMatrix();
       }
     }
@@ -73,7 +100,7 @@ function explodeShapes() {
       y: newPosition.y,
       z: newPosition.z,
       duration: 1,
-      ease: "sine.out",
+      ease: 'sine.out',
     });
 
   });
