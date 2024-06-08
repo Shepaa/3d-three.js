@@ -15,18 +15,20 @@ const spinAllBtn = document.querySelector('#spinAllBtn');
 const spinEachBtn = document.querySelector('#spinEachBtn');
 const group = new THREE.Group();
 
-spinEachBtn.addEventListener('click', () => {
+function spinEach() {
   meshes.forEach(mesh => {
     gsap.to(mesh.rotation,
         {duration: 1, y: mesh.rotation.y + Math.PI * 2, ease: 'power2.out'});
   });
-});
+}
+
+spinEachBtn.addEventListener('click', spinEach);
 
 spinAllBtn.addEventListener('click', () => {
   const randomAxis = new THREE.Vector3(
       Math.random() - 0.5,
       Math.random() - 0.5,
-      Math.random() - 0.5
+      Math.random() - 0.5,
   ).normalize();
 
   gsap.to(group.rotation, {
@@ -34,7 +36,7 @@ spinAllBtn.addEventListener('click', () => {
     x: randomAxis.x * Math.PI * 2,
     y: randomAxis.y * Math.PI * 2,
     z: randomAxis.z * Math.PI * 2,
-    ease: 'power2.out'
+    ease: 'power2.out',
   });
 });
 shapeGeneratorBtn.addEventListener('click', generateShape);
@@ -102,7 +104,14 @@ function explodeShapes() {
       duration: 1,
       ease: 'sine.out',
     });
-
+    gsap.to(mesh.rotation,
+        {
+          duration: 1,
+          x: newPosition.x,
+          y: newPosition.y,
+          z: newPosition.z,
+          ease: 'power2.out',
+        });
   });
 }
 
