@@ -44,12 +44,8 @@ explodeBtn.addEventListener('click', explodeShapes);
 
 const scene = new THREE.Scene();
 
-const geometry = generateGeometry(geometries);
-const material = new THREE.MeshBasicMaterial({map: generateTexture(textures)});
-const mesh = new THREE.Mesh(geometry, material);
-group.add(mesh);
-scene.add(group);
-let meshes = [mesh];
+
+let meshes = [];
 
 function generateShape() {
   while (scene.children.length > 0) {
@@ -69,6 +65,9 @@ function generateShape() {
         mesh.position.set((x - shapeSize.xValue / 2 - 0.5) * 1.2,
             (y - shapeSize.yValue / 2 - 0.5) * 1.2,
             (z - shapeSize.zValue / 2 - 0.5) * 1.2);
+
+        mesh.userData.originalPosition = mesh.position.clone();
+        mesh.userData.originalRotation = mesh.rotation.clone();
         group.add(mesh);
         scene.add(group);
         meshes.push(mesh);
@@ -84,34 +83,53 @@ function generateShape() {
 
 function explodeShapes() {
   meshes.forEach(mesh => {
-    const newPosition = mesh.position.clone();
-    if (mesh.position.length() === 0) {
-      newPosition.add(new THREE.Vector3(2, 2, 2));
+    if (mesh.userData.isExploded) {
+      gsap.to(mesh.position, {
+        x: mesh.userData.originalPosition.x,
+        y: mesh.userData.originalPosition.y,
+        z: mesh.userData.originalPosition.z,
+        duration: 1,
+        ease: 'sine.out',
+      });
+      gsap.to(mesh.rotation, {
+        x: mesh.userData.originalRotation.x,
+        y: mesh.userData.originalRotation.y,
+        z: mesh.userData.originalRotation.z,
+        duration: 1,
+        ease: 'power2.out',
+      });
+      mesh.userData.isExploded = false;
     } else {
-      const randomDirection = new THREE.Vector3(
-          Math.random() - 0.5,
-          Math.random() - 0.5,
-          Math.random() - 0.5,
-      ).normalize().multiplyScalar(10);
+      const newPosition = mesh.position.clone();
+      if (mesh.position.length() === 0) {
+        newPosition.add(new THREE.Vector3(2, 2, 2));
+      } else {
+        const randomDirection = new THREE.Vector3(
+            Math.random() - 0.5,
+            Math.random() - 0.5,
+            Math.random() - 0.5,
+        ).normalize().multiplyScalar(10);
 
-      newPosition.add(randomDirection);
+        newPosition.add(randomDirection);
+      }
+
+      gsap.to(mesh.position, {
+        x: newPosition.x,
+        y: newPosition.y,
+        z: newPosition.z,
+        duration: 1,
+        ease: 'sine.out',
+      });
+      gsap.to(mesh.rotation,
+          {
+            duration: 1,
+            x: newPosition.x,
+            y: newPosition.y,
+            z: newPosition.z,
+            ease: 'power2.out',
+          });
+      mesh.userData.isExploded = true;
     }
-
-    gsap.to(mesh.position, {
-      x: newPosition.x,
-      y: newPosition.y,
-      z: newPosition.z,
-      duration: 1,
-      ease: 'sine.out',
-    });
-    gsap.to(mesh.rotation,
-        {
-          duration: 1,
-          x: newPosition.x,
-          y: newPosition.y,
-          z: newPosition.z,
-          ease: 'power2.out',
-        });
   });
 }
 
@@ -151,4 +169,5 @@ const tick = () => {
 // Call tick again on the next frame
   window.requestAnimationFrame(tick);
 };
+generateShape()
 tick();

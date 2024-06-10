@@ -3,7 +3,7 @@ import loadingManager from './loadingManager.js';
 
 const textureLoader = new THREE.TextureLoader(loadingManager);
 export const textures = [
-  textureLoader.load('/textures/fire.jpg'),
-  textureLoader.load('/textures/water.jpg'),
-  textureLoader.load('/textures/forest.jpg'),
+  textureLoader.load('/textures/fire.webp'),
+  textureLoader.load('/textures/water.webp'),
+  textureLoader.load('/textures/forest.webp'),
 ]
